@@ -1,5 +1,7 @@
 import json, bcrypt, jwt
 
+
+from datetime               import datetime, timedelta
 from my_settings            import ALGORITHM
 from westagram.settings     import SECRET_KEY
 from django.core.exceptions import ValidationError
@@ -48,13 +50,16 @@ class SignInView(View):
     def post(self,request):
         data = json.loads(request.body) 
         try:
-            email            = data['email']
-            password         = data['password']
+            email                 = data['email']
+            password              = data['password']
+            user                  = User.objects.get(email=email)
+            user_saved_db         = user.password
+      
+            current_time          = datetime.utcnow()
+            expiration_time       = timedelta(seconds=300)
+            token_expiration_time = current_time+expiration_time
 
-            user             = User.objects.get(email=email)
-            user_saved_db    = user.password
-
-            jwt_access_token = jwt.encode({'id':user.id},SECRET_KEY,algorithm=ALGORITHM)            
+            jwt_access_token = jwt.encode({'id':user.id,'exp':token_expiration_time},SECRET_KEY,algorithm=ALGORITHM)            
 
             if bcrypt.checkpw(password.encode('utf-8'),user_saved_db.encode('utf-8')):
                 return JsonResponse({'messasge':'SUCCESS','JWT_TOKEN':jwt_access_token}, status=200)

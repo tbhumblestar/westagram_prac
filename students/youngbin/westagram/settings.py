@@ -107,11 +107,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC' # 기본설정
+# USE_TZ = True # 기본설정
+TIME_ZONE = 'Asia/Seoul' # 한국시간에 맞춤
+USE_TZ = False # False로 해둬야 db에 저장될 때 한국 시간에 맞춰서 저장됨
 
 USE_I18N = True
 
-USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
