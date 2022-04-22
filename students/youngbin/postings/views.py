@@ -32,14 +32,12 @@ class PostingView(View):
                     posting   = posting,
                     image_url = image_url,
                 )
-
-            
+      
             return JsonResponse({'messasge':'created'}, status=201)
                     
         except KeyError:
             return JsonResponse({"message":"KEY_ERROR"},status=400)
-        except ValidationError as error:
-            return JsonResponse({"message": error.messages}, status=409)
+        
 
 
                 
