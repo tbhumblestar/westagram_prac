@@ -1,4 +1,4 @@
-import jwt
+import jwt, json
 from django.conf import settings
 from my_settings import ALGORITHM
 from .models     import User
@@ -10,9 +10,11 @@ from django.http import JsonResponse
 def access_token_check(func):
     def wrapper(self,request,*args,**kwargs):
         try:
+            data = json.loads(request.body)
             access_token = request.headers.get('Authorization')
+            print(access_token)
             payload      = jwt.decode(access_token,settings.SECRET_KEY,ALGORITHM)
-            request.user = User.get.objects(id = payload['id'])
+            # self.user = User.objects.get(id = payload['id'])
 
             return func(self,request,*args,**kwargs)
 
