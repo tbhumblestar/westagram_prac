@@ -13,6 +13,7 @@ from .validation            import (
     validate_email,
     validate_phone_number)
 
+
 class SignUpView(View):
     def post(self,request):
         data = json.loads(request.body) 
@@ -56,7 +57,7 @@ class SignInView(View):
             user_saved_db         = user.password
       
             current_time          = datetime.utcnow()
-            expiration_time       = timedelta(seconds=300000)
+            expiration_time       = timedelta(seconds=30000000)
             token_expiration_time = current_time+expiration_time
 
             jwt_access_token = jwt.encode({'id':user.id,'exp':token_expiration_time},SECRET_KEY,algorithm=ALGORITHM)            

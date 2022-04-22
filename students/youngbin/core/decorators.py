@@ -14,7 +14,7 @@ def access_token_check(func):
             payload      = jwt.decode(access_token, settings.SECRET_KEY,ALGORITHM)
             
             #함수(func)에 유저객체를 담아보내기 위한 것
-            self.user = User.get.objects(id = payload['id'])
+            self.user = User.objects.get(id = payload['id'])
 
             return func(self,request,*args,**kwargs)
 
