@@ -50,7 +50,7 @@ class PostingView(View):
                 'title'        : posting.title,
                 'text'         : posting.text,
                 'created_time' : posting.created_at,
-                'pk'           : posting.pk,
+                'posting_id'   : posting.pk,
                 'images'       : [i.image_url for i in Image.objects.filter(posting_id=posting.id)],
             })
 
@@ -60,14 +60,16 @@ class PostingView(View):
 
 class CommentView(View):
     @access_token_check
-    def post(self,request):
+    def post(self,request,posting_id):
         data = json.loads(request.body)
         try:
             user            = self.user
             text            = data['text']
-            posting_id      = int(data['posting_id'])
             
+            #만약 json데이터로 posting_id를 받을 경우
+            #posting_id      = int(data['posting_id'])
             #json데이터로 posting객체를 잡아올 수 있나?? 안되면 객체를 여기서 잡아주는 수 밖에 없음
+            
             posting = Posting.objects.get(id=posting_id)
 
             Comment.objects.create(
@@ -85,6 +87,15 @@ class CommentView(View):
 
         except Posting.DoesNotExist:
             return JsonResponse({"message":"POSTING_DOES_NOT_EXIST"},status=404)
+
+    def get(self,request,posting_id):#특정 게시글의 comment를 보려고 하는 것임 / 최신순?
+        posting = Posting.objects.get(id=posting_id)
+        comments_list = [{"user":comment.user.name,"text":comment.text} for comment in posting.comments.all()]
+        return JsonResponse({
+            "message"       : "success",
+            'comments_list' : comments_list
+            }, status=200)
+
 
         
 
