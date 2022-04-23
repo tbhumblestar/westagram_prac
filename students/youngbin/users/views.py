@@ -1,4 +1,5 @@
 import json, bcrypt, jwt
+from core.decorators import access_token_check
 
 
 from datetime               import datetime, timedelta
@@ -7,11 +8,12 @@ from westagram.settings     import SECRET_KEY
 from django.core.exceptions import ValidationError
 from django.http            import JsonResponse
 from django.views           import View
-from .models                import User
+from .models                import User, Follow
 from .validation            import (
     validate_password,
     validate_email,
     validate_phone_number)
+
 
 
 class SignUpView(View):
@@ -65,6 +67,30 @@ class SignInView(View):
             if bcrypt.checkpw(password.encode('utf-8'),user_saved_db.encode('utf-8')):
                 return JsonResponse({'messasge':'SUCCESS','JWT_TOKEN':jwt_access_token}, status=200)
             return JsonResponse({"message":"INCORRECT_PASSWORD"},status=401)
+
+        except KeyError:
+            return JsonResponse({"message":"KEY_ERROR"},status=400)
+        except User.DoesNotExist:
+            return JsonResponse({"message":"NOT_REGISTERED_EMAIL"},status=401)
+
+class LikeView(View):
+    @access_token_check
+    def post(self,request):
+        data = json.loads(request.body)
+        user = self.user
+        try:
+            follow_to_email = data['follow_to_email']#이메일로 받지 않을까??
+            follow_to       = User.objects.get(email = follow_to_email)
+            if Follow.objects.filter(follow_from=user,follow_to=follow_to).exists():
+                Follow.objects.filter(follow_from=user,follow_to=follow_to).delete()
+                return JsonResponse({"message":"팔로우가 취소되었습니다!"},status=201)
+
+            Follow.objects.create(
+                follow_from=user,
+                follow_to=follow_to,
+                )
+
+            return JsonResponse({"message":"팔로우가 등록되었습니다!"},status=201)
 
         except KeyError:
             return JsonResponse({"message":"KEY_ERROR"},status=400)
