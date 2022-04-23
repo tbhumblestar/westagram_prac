@@ -4,4 +4,5 @@ from . import views
 
 urlpatterns = [
     path('',views.PostingView.as_view()),
+    path('/comment',views.CommentView.as_view()),
 ]

@@ -17,3 +17,12 @@ class Image(TimeStampModel):
 
     class Meta:
         db_table = 'images'
+
+
+class Comment(TimeStampModel):
+    posting   = models.ForeignKey(Posting,on_delete=models.CASCADE,related_name='comments')
+    user      = models.ForeignKey(User,on_delete=models.CASCADE,related_name='users')
+    text      = models.TextField(max_length=500)
+
+    class Meta:
+        db_table = 'comments'

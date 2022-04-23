@@ -39,7 +39,7 @@ class SignUpView(View):
                 email        = validated_email,
                 phone_number = validated_phone_number,
             )
-            return JsonResponse({'messasge':'created'}, status=201)
+            return JsonResponse({'messasge':'user_created'}, status=201)
 
         except KeyError:
             return JsonResponse({"message":"KEY_ERROR"},status=400)

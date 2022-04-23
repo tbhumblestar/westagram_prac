@@ -27,7 +27,7 @@ def access_token_check(func):
 
         except jwt.DecodeError:
             return JsonResponse({'message' : 'invalid_payload'}, status=401)
-            #유효성 검사에 실패하여 토큰을 디코딩 할 수 없을 때, 즉 토큰 자체가 빈 문자열이거나 header혹은 payload가 손상되었을 때 발생
+            #유효성 검사에 실패하여 토큰을 디코딩 할 수 없을 때, 즉 토큰 자체가 빈 문자열이거나 header혹은 payload가 손상되었을 때 발생, 혹은 시크릿키나 알고리즘이 다를 경우 발생
 
         except jwt.InvalidSignatureError:
             return JsonResponse({'message' : 'invalid_signature'}, status=401)
