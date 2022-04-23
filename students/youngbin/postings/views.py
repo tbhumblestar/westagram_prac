@@ -5,7 +5,7 @@ from django.http            import JsonResponse
 from django.views           import View
 from .models                import User
 from core.decorators        import access_token_check
-from postings.models        import Posting, Image, Comment
+from postings.models        import Posting, Image, Comment, Like
 from django.core.exceptions import ValidationError
 # Create your views here.
 
@@ -52,6 +52,7 @@ class PostingView(View):
                 'created_time' : posting.created_at,
                 'posting_id'   : posting.pk,
                 'images'       : [i.image_url for i in Image.objects.filter(posting_id=posting.id)],
+                'likes_count'  : posting.likes.all().count()
             })
 
         return JsonResponse({'posting_list':posting_list}, status=200)
@@ -79,7 +80,6 @@ class CommentView(View):
                 #posting_id = posting_id, #이렇게도 할 수 있다.
             )
 
-
             return JsonResponse({'messasge':'comment_created'}, status=201)
                     
         except KeyError:
@@ -97,7 +97,39 @@ class CommentView(View):
             }, status=200)
 
 
+class LikeView(View):
+    @access_token_check
+    def post(self,request,posting_id):
+        try:
+            user    = self.user
+            posting = Posting.objects.get(id=posting_id)
+
+            if Like.objects.filter(user=user,posting=posting).exists():
+                Like.objects.filter(user=user,posting=posting).delete()
+                return JsonResponse({'messasge':'좋아요 취소!'}, status=201)
+
+            else:
+                Like.objects.create(
+                    user    = user,
+                    posting = posting,
+                )
+                return JsonResponse({'messasge':'좋아요 성공!'}, status=201)
+
+        except KeyError:
+            return JsonResponse({"message":"KEY_ERROR"},status=400)
+        except Posting.DoesNotExist:
+            return JsonResponse({"message":"POSTING_DOES_NOT_EXIST"},status=404)
+
+    def get(self,request,posting_id):
+            try:
+                posting    = Posting.objects.get(id=posting_id)
+                like_count = posting.likes.all().count()
+                
+                return JsonResponse({'like_count':like_count}, status=201)
+
+            except Posting.DoesNotExist:
+                return JsonResponse({"message":"POSTING_DOES_NOT_EXIST"},status=404)
+
         
 
 
-                

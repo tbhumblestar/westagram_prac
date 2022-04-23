@@ -10,7 +10,8 @@ class Posting(TimeStampModel):
 
     class Meta:
         db_table = 'postings'
-    
+
+
 class Image(TimeStampModel):
     posting   = models.ForeignKey(Posting,on_delete=models.CASCADE,related_name='images')
     image_url = models.TextField()
@@ -26,3 +27,9 @@ class Comment(TimeStampModel):
 
     class Meta:
         db_table = 'comments'
+
+
+class Like(TimeStampModel):
+    #진짜 Like에 따라 한행의 데이터를 삭제하는 게 효율적인 걸까?
+    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='likes')
+    posting = models.ForeignKey(Posting,on_delete=models.CASCADE,related_name='likes')
