@@ -57,8 +57,6 @@ class PostingView(View):
 
         return JsonResponse({'posting_list':posting_list}, status=200)
 
-
-
 class CommentView(View):
     @access_token_check
     def post(self,request,posting_id):
