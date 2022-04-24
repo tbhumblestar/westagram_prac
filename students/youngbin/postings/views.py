@@ -5,7 +5,7 @@ from django.http            import JsonResponse
 from django.views           import View
 from .models                import User
 from core.decorators        import access_token_check
-from postings.models        import Posting, Image, Comment, Like
+from postings.models        import Posting, Image, Comment, Like, Tag
 from django.core.exceptions import ValidationError
 # Create your views here.
 
@@ -17,7 +17,7 @@ class PostingView(View):
             user            = self.user
             title           = data['title']
             text            = data.get('text',None) #없을 수도 있음
-
+            tag_list        = data.get('tag_list',None).split(',')
             image_url_list  = data.get('image_url_list',None).split(',') #없을 수도 있음, #문자열을 리스트로 바꿔줘야 함!
             
             Posting.objects.create(
@@ -33,6 +33,11 @@ class PostingView(View):
                     posting   = posting,
                     image_url = image_url,
                 )
+
+            for tag in tag_list:
+                tag = Tag.objects.get_or_create(tag_name=tag)
+                #get_or_create : 있으면 가져오고, 없으면 생성. 튜플 형태의 결과값을 가져옴. 생성시 두번째 인자가 True이고, 가져왓을 경우엔 False임
+                posting.tag.add(tag[0])
       
             return JsonResponse({'messasge':'posting_created'}, status=201)
                     
